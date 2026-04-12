@@ -84,16 +84,16 @@
   <div class="page active" id="page1">
     <div class="form-body">
       <div class="section-title">1. Thông tin cơ bản</div>
-      <p class="hint" style="margin-bottom:18px">Ghi theo Căn Cước Công Dân của học sinh</p>
+      <p class="hint" style="margin-bottom:18px">Ghi theo Căn Cước Công Dân của Học Sinh</p>
       <div class="field-group">
         <label>Họ và tên <span class="req">*</span></label>
-        <input type="text" id="hoTen" placeholder="Ví dụ: NGUYỄN VĂN AN">
+        <input type="text" id="hoTen" placeholder="Ví dụ: Nguyễn Văn An">
         <div class="error-msg" id="err_hoTen">Vui lòng nhập họ và tên</div>
       </div>
       <div class="row2">
         <div class="field-group">
           <label>Ngày sinh <span class="req">*</span></label>
-          <input type="text" id="ngaySinh" placeholder="DD/MM/YYYY" maxlength="10" inputmode="numeric" autocomplete="off">
+          <input type="text" id="ngaySinh" placeholder="dd/mm/yyyy" maxlength="10" inputmode="numeric" autocomplete="off">
           <div class="error-msg" id="err_ngaySinh">Vui lòng nhập ngày sinh hợp lệ (VD: 15/08/2010)</div>
         </div>
         <div class="field-group">
@@ -137,8 +137,8 @@
   <!-- PAGE 2: Nơi thường trú -->
   <div class="page" id="page2">
     <div class="form-body">
-      <div class="section-title">2. Nơi thường trú</div>
-      <p class="hint" style="margin-bottom:18px">Ghi theo Căn Cước Công Dân của học sinh</p>
+      <div class="section-title">2. Nơi thường trú (Địa chỉ sau sát nhập)</div>
+      <p class="hint" style="margin-bottom:18px">Ghi theo Căn Cước Công Dân của Học Sinh</p>
       <div class="field-group">
         <label>Tỉnh/Thành phố <span class="req">*</span></label>
         <select id="tt_tinh" onchange="cascadeXa('tt_tinh','tt_xa', data1)">
@@ -159,11 +159,11 @@
   <!-- PAGE 3: Chỗ ở hiện nay -->
   <div class="page" id="page3">
     <div class="form-body">
-      <div class="section-title">3. Chỗ ở hiện nay</div>
+      <div class="section-title">3. Chỗ ở hiện nay (Địa chỉ sau sát nhập)</div>
       <p class="hint" style="margin-bottom:18px">Ghi địa chỉ nơi ở hiện tại của học sinh</p>
       <div class="field-group">
-        <label>Số nhà, đường phố / Xóm, thôn</label>
-        <input type="text" id="cn_sonha" placeholder="Ví dụ: Số 12, Đường Trần Hưng Đạo">
+        <label>Số nhà, đường phố / Xóm, thôn <span class="req">*</span></label>
+        <input type="text" id="cn_sonha" placeholder="Ví dụ: Số 12, Đường Thanh Niên / Xóm Phúc Điền, thôn Thiện Trang">
       </div>
       <div class="field-group">
         <label>Tỉnh/Thành phố <span class="req">*</span></label>
@@ -185,10 +185,10 @@
   <!-- PAGE 4: Nơi sinh -->
   <div class="page" id="page4">
     <div class="form-body">
-      <div class="section-title">4. Nơi sinh</div>
-      <p class="hint" style="margin-bottom:18px">Ghi theo Giấy Khai Sinh</p>
+      <div class="section-title">4. Nơi sinh (Địa chỉ trước sát nhập)</div>
+      <p class="hint" style="margin-bottom:18px">Ghi theo Giấy Khai Sinh của Học Sinh</p>
       <div class="field-group">
-        <label>Bệnh viện / Cơ sở y tế</label>
+        <label>Bệnh viện / Cơ sở y tế <span class="req">*</span></label>
         <input type="text" id="ns_benhvien" placeholder="Ví dụ: Bệnh viện Phụ sản Trung ương">
       </div>
       <div class="field-group">
@@ -218,8 +218,8 @@
   <!-- PAGE 5: Quê quán -->
   <div class="page" id="page5">
     <div class="form-body">
-      <div class="section-title">5. Quê quán</div>
-      <p class="hint" style="margin-bottom:18px">Ghi theo Giấy Khai Sinh</p>
+      <div class="section-title">5. Quê quán (Địa chỉ trước sát nhập)</div>
+      <p class="hint" style="margin-bottom:18px">Ghi theo mục Quê Quán trên Giấy Khai Sinh của Học Sinh</p>
       <div class="field-group">
         <label>Tỉnh/Thành phố <span class="req">*</span></label>
         <select id="qq_tinh" onchange="cascadeHuyen('qq_tinh','qq_huyen','qq_xa', dataMerged)">
