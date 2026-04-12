@@ -93,8 +93,8 @@
       <div class="row2">
         <div class="field-group">
           <label>Ngày sinh <span class="req">*</span></label>
-          <input type="date" id="ngaySinh">
-          <div class="error-msg" id="err_ngaySinh">Vui lòng chọn ngày sinh</div>
+          <input type="text" id="ngaySinh" placeholder="DD/MM/YYYY" maxlength="10" inputmode="numeric" autocomplete="off">
+          <div class="error-msg" id="err_ngaySinh">Vui lòng nhập ngày sinh hợp lệ (VD: 15/08/2010)</div>
         </div>
         <div class="field-group">
           <label>Giới tính <span class="req">*</span></label>
@@ -344,7 +344,7 @@ function validatePage(p) {
   let ok = true;
   if (p === 1) {
     if (!val('hoTen')) ok = showErr('hoTen', true) && false; else showErr('hoTen', false);
-    if (!val('ngaySinh')) ok = showErr('ngaySinh', true) && false; else showErr('ngaySinh', false);
+    const ns = val('ngaySinh'); if (!ns || !isValidDate(ns)) ok = showErr('ngaySinh', true) && false; else showErr('ngaySinh', false);
     if (!val('gioiTinh')) ok = showErr('gioiTinh', true) && false; else showErr('gioiTinh', false);
     if (!val('danToc')) ok = showErr('danToc', true) && false; else showErr('danToc', false);
   } else if (p === 2) {
@@ -402,11 +402,34 @@ function goBack() {
   if (currentPage > 1) { currentPage--; updateUI(); window.scrollTo(0, 0); }
 }
 
-function formatDate(d) {
-  if (!d) return '';
-  const [y,m,day] = d.split('-');
-  return day + '/' + m + '/' + y;
+function formatDate(d) { return d || ''; }
+
+function isValidDate(str) {
+  if (!/^\d{2}\/\d{2}\/\d{4}$/.test(str)) return false;
+  const [d,m,y] = str.split('/').map(Number);
+  if (m < 1 || m > 12 || d < 1 || d > 31) return false;
+  if (y < 1900 || y > new Date().getFullYear()) return false;
+  const date = new Date(y, m-1, d);
+  return date.getDate() === d && date.getMonth() === m-1;
 }
+
+// Date mask: auto-insert / after DD and MM
+document.addEventListener('DOMContentLoaded', function() {
+  const inp = document.getElementById('ngaySinh');
+  inp.addEventListener('input', function() {
+    let v = this.value.replace(/\D/g, '');
+    if (v.length > 8) v = v.slice(0, 8);
+    let out = '';
+    if (v.length > 4) out = v.slice(0,2) + '/' + v.slice(2,4) + '/' + v.slice(4);
+    else if (v.length > 2) out = v.slice(0,2) + '/' + v.slice(2);
+    else out = v;
+    this.value = out;
+  });
+  inp.addEventListener('keydown', function(e) {
+    const allowed = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab'];
+    if (!allowed.includes(e.key) && !/^\d$/.test(e.key)) e.preventDefault();
+  });
+});
 
 function submitForm() {
   const summary = [
