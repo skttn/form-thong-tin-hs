@@ -432,26 +432,63 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function submitForm() {
-  const summary = [
-    ['Họ và tên', val('hoTen')],
-    ['Ngày sinh', formatDate(val('ngaySinh'))],
-    ['Giới tính', val('gioiTinh')],
-    ['Dân tộc', val('danToc')],
-    ['Nơi thường trú - Tỉnh/TP', val('tt_tinh')],
-    ['Nơi thường trú - Xã/Phường', val('tt_xa')],
-    ['Chỗ ở - Số nhà/Thôn', val('cn_sonha') || '(không điền)'],
-    ['Chỗ ở - Tỉnh/TP', val('cn_tinh')],
-    ['Chỗ ở - Xã/Phường', val('cn_xa')],
-    ['Nơi sinh - Bệnh viện', val('ns_benhvien') || '(không điền)'],
-    ['Nơi sinh - Tỉnh/TP', val('ns_tinh')],
-    ['Nơi sinh - Quận/Huyện', val('ns_huyen')],
-    ['Nơi sinh - Xã/Phường', val('ns_xa')],
-    ['Quê quán - Tỉnh/TP', val('qq_tinh')],
-    ['Quê quán - Quận/Huyện', val('qq_huyen')],
-    ['Quê quán - Xã/Phường', val('qq_xa')],
-  ];
-  const html = summary.map(([k,v]) =>
-    `<div class="summary-item"><span class="summary-key">${k}</span><span class="summary-val">${v}</span></div>`
+  const data = {
+    hoTen:      val('hoTen'),
+    ngaySinh:   val('ngaySinh'),
+    gioiTinh:   val('gioiTinh'),
+    danToc:     val('danToc'),
+    tt_tinh:    val('tt_tinh'),
+    tt_xa:      val('tt_xa'),
+    cn_sonha:   val('cn_sonha'),
+    cn_tinh:    val('cn_tinh'),
+    cn_xa:      val('cn_xa'),
+    ns_benhvien:val('ns_benhvien'),
+    ns_tinh:    val('ns_tinh'),
+    ns_huyen:   val('ns_huyen'),
+    ns_xa:      val('ns_xa'),
+    qq_tinh:    val('qq_tinh'),
+    qq_huyen:   val('qq_huyen'),
+    qq_xa:      val('qq_xa'),
+  };
+
+  // ← Dán URL Web App của bạn vào đây
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxestUPGkhDRByJ-S1IT8vd9y6Lg8QX6ebv4pDCoSP0gdo82woZxGkSWdK1eAwwV5m3/exec';
+
+  const btnNext = document.getElementById('btnNext');
+  btnNext.disabled = true;
+  btnNext.textContent = '⏳ Đang gửi...';
+
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',        // bắt buộc vì Apps Script không trả CORS header
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  .then(() => {
+    // no-cors không đọc được response → cứ chuyển sang trang thành công
+    showSummary(data);
+  })
+  .catch(err => {
+    alert('Lỗi kết nối: ' + err.message + '\nVui lòng thử lại.');
+    btnNext.disabled = false;
+    btnNext.textContent = '✓ Hoàn tất & Gửi';
+  });
+}
+
+function showSummary(data) {
+  const labels = {
+    hoTen:'Họ và tên', ngaySinh:'Ngày sinh', gioiTinh:'Giới tính',
+    danToc:'Dân tộc', tt_tinh:'Thường trú - Tỉnh/TP', tt_xa:'Thường trú - Xã/Phường',
+    cn_sonha:'Chỗ ở - Số nhà', cn_tinh:'Chỗ ở - Tỉnh/TP', cn_xa:'Chỗ ở - Xã/Phường',
+    ns_benhvien:'Nơi sinh - Bệnh viện', ns_tinh:'Nơi sinh - Tỉnh/TP',
+    ns_huyen:'Nơi sinh - Quận/Huyện', ns_xa:'Nơi sinh - Xã/Phường',
+    qq_tinh:'Quê quán - Tỉnh/TP', qq_huyen:'Quê quán - Quận/Huyện', qq_xa:'Quê quán - Xã/Phường'
+  };
+  const html = Object.entries(data).map(([k,v]) =>
+    `<div class="summary-item">
+       <span class="summary-key">${labels[k]||k}</span>
+       <span class="summary-val">${v||'(không điền)'}</span>
+     </div>`
   ).join('');
   document.getElementById('summaryBox').innerHTML = html;
   currentPage = 6;
