@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Phiếu Thông Tin Học Sinh</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #e0f2fe, #f0fdf4);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      padding: 36px 40px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #1e40af;
+      margin-bottom: 28px;
+      font-size: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #374151;
+      font-size: 0.95rem;
+    }
+
+    label span.required { color: #ef4444; margin-left: 3px; }
+
+    input, select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #111827;
+      transition: border-color 0.2s;
+      background: #f9fafb;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      background: #fff;
+    }
+
+    select:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    button {
+      width: 100%;
+      padding: 13px;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+
+    button:hover { background: #1d4ed8; }
+
+    #result {
+      margin-top: 24px;
+      padding: 18px 20px;
+      background: #f0fdf4;
+      border: 1.5px solid #86efac;
+      border-radius: 10px;
+      display: none;
+    }
+
+    #result h2 {
+      color: #16a34a;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+
+    #result p {
+      margin: 5px 0;
+      color: #374151;
+      font-size: 0.97rem;
+    }
+
+    #result p strong { color: #111827; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>📋 Phiếu Thông Tin Học Sinh</h1>
+
+  <form id="studentForm" onsubmit="submitForm(event)">
+
+    <!-- Họ và tên -->
+    <div class="form-group">
+      <label>Họ và tên <span class="required">*</span></label>
+      <input type="text" id="hoTen" placeholder="Nguyễn Văn A" required />
+    </div>
+
+    <!-- Ngày sinh -->
+    <div class="form-group">
+      <label>Ngày sinh <span class="required">*</span></label>
+      <input type="date" id="ngaySinh" required />
+    </div>
+
+    <!-- Lớp học -->
+    <div class="form-group">
+      <label>Lớp học <span class="required">*</span></label>
+      <input type="text" id="lopHoc" placeholder="Ví dụ: 10A1" required />
+    </div>
+
+    <!-- Tỉnh/Thành phố -->
+    <div class="form-group">
+      <label>Tỉnh / Thành phố <span class="required">*</span></label>
+      <select id="tinh" onchange="loadPhuong()" required>
+        <option value="">-- Chọn Tỉnh/Thành phố --</option>
+      </select>
+    </div>
+
+    <!-- Xã/Phường -->
+    <div class="form-group">
+      <label>Xã / Phường <span class="required">*</span></label>
+      <select id="phuong" required disabled>
+        <option value="">-- Chọn Xã/Phường --</option>
+      </select>
+    </div>
+
+    <button type="submit">✅ Xác nhận thông tin</button>
+  </form>
+
+  <!-- Kết quả hiển thị sau khi submit -->
+  <div id="result">
+    <h2>🎉 Thông tin đã ghi nhận!</h2>
+    <p><strong>Họ và tên:</strong> <span id="r-hoTen"></span></p>
+    <p><strong>Ngày sinh:</strong> <span id="r-ngaySinh"></span></p>
+    <p><strong>Lớp học:</strong> <span id="r-lopHoc"></span></p>
+    <p><strong>Tỉnh/Thành phố:</strong> <span id="r-tinh"></span></p>
+    <p><strong>Xã/Phường:</strong> <span id="r-phuong"></span></p>
+  </div>
+</div>
+
+<script>
+  // ============================================================
+  // DỮ LIỆU TỈNH/THÀNH VÀ XÃ/PHƯỜNG (cascading)
+  // Bạn có thể mở rộng thêm tỉnh và phường tùy ý
+  // ============================================================
+  const diaChiData = {
+    "Hà Nội": [
+      "Phường Hoàn Kiếm", "Phường Ba Đình", "Phường Đống Đa",
+      "Phường Hai Bà Trưng", "Phường Cầu Giấy", "Phường Nam Từ Liêm",
+      "Phường Bắc Từ Liêm", "Phường Thanh Xuân", "Phường Hà Đông",
+      "Xã Sóc Sơn", "Xã Đông Anh", "Xã Gia Lâm"
+    ],
+    "TP. Hồ Chí Minh": [
+      "Phường Bến Nghé (Q.1)", "Phường Bến Thành (Q.1)", "Phường Phạm Ngũ Lão (Q.1)",
+      "Phường Tân Định (Q.1)", "Phường 12 (Q.3)", "Phường 14 (Q.3)",
+      "Phường Bình Thọ (TP. Thủ Đức)", "Phường Linh Trung (TP. Thủ Đức)",
+      "Phường Tân Phú (Q. Tân Phú)", "Xã Bình Chánh", "Xã Hóc Môn", "Xã Củ Chi"
+    ],
+    "Đà Nẵng": [
+      "Phường Hải Châu 1", "Phường Hải Châu 2", "Phường Thanh Bình",
+      "Phường Thuận Phước", "Phường Mỹ An", "Phường Bắc Mỹ An",
+      "Phường Phước Mỹ", "Xã Hòa Vang", "Phường An Hải Tây", "Phường Mân Thái"
+    ],
+    "Cần Thơ": [
+      "Phường Tân An (Q. Ninh Kiều)", "Phường An Hòa (Q. Ninh Kiều)",
+      "Phường Long Hòa (Q. Bình Thủy)", "Phường Thới An (Q. Ô Môn)",
+      "Xã Thới Lai", "Xã Cờ Đỏ", "Xã Vĩnh Thạnh", "Phường Châu Văn Liêm"
+    ],
+    "Hải Phòng": [
+      "Phường Máy Tơ (Q. Ngô Quyền)", "Phường Lạc Viên (Q. Ngô Quyền)",
+      "Phường Đông Khê (Q. Ngô Quyền)", "Phường Trại Chuối (Q. Hồng Bàng)",
+      "Xã An Lão", "Xã Tiên Lãng", "Xã Vĩnh Bảo", "Phường Dư Hàng Kênh"
+    ],
+    "Nghệ An": [
+      "Phường Lê Mao (TP. Vinh)", "Phường Hồng Sơn (TP. Vinh)",
+      "Phường Bến Thủy (TP. Vinh)", "Xã Nghi Lộc",
+      "Xã Diễn Châu", "Xã Quỳnh Lưu", "Xã Yên Thành", "Xã Nam Đàn"
+    ],
+    "Thanh Hóa": [
+      "Phường Điện Biên (TP. Thanh Hóa)", "Phường Ba Đình (TP. Thanh Hóa)",
+      "Phường Lam Sơn (TP. Thanh Hóa)", "Xã Đông Sơn",
+      "Xã Triệu Sơn", "Xã Thọ Xuân", "Xã Hoằng Hóa", "Xã Sầm Sơn"
+    ],
+    "Bình Dương": [
+      "Phường Phú Hòa (TP. Thủ Dầu Một)", "Phường Hiệp Thành (TP. Thủ Dầu Một)",
+      "Phường Tân Phước Khánh (TX. Tân Uyên)", "Phường Dĩ An",
+      "Phường Thuận An", "Xã Bàu Bàng", "Xã Dầu Tiếng", "Xã Phú Giáo"
+    ],
+    "Đồng Nai": [
+      "Phường Trung Dũng (TP. Biên Hòa)", "Phường Tân Phong (TP. Biên Hòa)",
+      "Phường Hòa Bình (TP. Biên Hòa)", "Xã Long Thành",
+      "Xã Nhơn Trạch", "Xã Trảng Bom", "Xã Định Quán", "Xã Xuân Lộc"
+    ],
+    "Khánh Hòa": [
+      "Phường Vạn Thắng (TP. Nha Trang)", "Phường Phước Tiến (TP. Nha Trang)",
+      "Phường Phước Hòa (TP. Nha Trang)", "Phường Tân Lập (TP. Nha Trang)",
+      "Xã Diên Khánh", "Xã Cam Lâm", "Xã Ninh Hòa", "Xã Vạn Ninh"
+    ]
+  };
+
+  // ============================================================
+  // KHỞI TẠO: Đổ dữ liệu tỉnh vào dropdown
+  // ============================================================
+  window.onload = function () {
+    const tinhSelect = document.getElementById("tinh");
+    Object.keys(diaChiData).sort().forEach(function (tinh) {
+      const option = document.createElement("option");
+      option.value = tinh;
+      option.textContent = tinh;
+      tinhSelect.appendChild(option);
+    });
+  };
+
+  // ============================================================
+  // CASCADING: Khi chọn tỉnh → nạp danh sách xã/phường
+  // ============================================================
+  function loadPhuong() {
+    const tinh = document.getElementById("tinh").value;
+    const phuongSelect = document.getElementById("phuong");
+
+    // Reset dropdown phường
+    phuongSelect.innerHTML = '<option value="">-- Chọn Xã/Phường --</option>';
+
+    if (!tinh) {
+      phuongSelect.disabled = true;
+      return;
+    }
+
+    const danhSach = diaChiData[tinh] || [];
+    danhSach.forEach(function (p) {
+      const option = document.createElement("option");
+      option.value = p;
+      option.textContent = p;
+      phuongSelect.appendChild(option);
+    });
+
+    phuongSelect.disabled = false;
+  }
+
+  // ============================================================
+  // SUBMIT: Hiển thị kết quả
+  // ============================================================
+  function submitForm(e) {
+    e.preventDefault();
+
+    const hoTen    = document.getElementById("hoTen").value.trim();
+    const ngaySinh = document.getElementById("ngaySinh").value;
+    const lopHoc   = document.getElementById("lopHoc").value.trim();
+    const tinh     = document.getElementById("tinh").value;
+    const phuong   = document.getElementById("phuong").value;
+
+    // Format ngày sinh dd/mm/yyyy
+    const [y, m, d] = ngaySinh.split("-");
+    const ngayFormatted = `${d}/${m}/${y}`;
+
+    document.getElementById("r-hoTen").textContent   = hoTen;
+    document.getElementById("r-ngaySinh").textContent = ngayFormatted;
+    document.getElementById("r-lopHoc").textContent  = lopHoc;
+    document.getElementById("r-tinh").textContent    = tinh;
+    document.getElementById("r-phuong").textContent  = phuong;
+
+    const resultDiv = document.getElementById("result");
+    resultDiv.style.display = "block";
+    resultDiv.scrollIntoView({ behavior: "smooth" });
+  }
+</script>
+</body>
+</html>
